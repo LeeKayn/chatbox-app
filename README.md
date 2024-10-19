@@ -3,10 +3,6 @@
 ## Download and Install
 
 1. Clone the repository:
-    ```sh
-    git clone <repository-url>
-    cd <repository-directory>
-    ```
 
 2. Create a virtual environment and install dependencies:
     ```sh
