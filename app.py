@@ -5,6 +5,7 @@ import networkx as nx
 from pyvis.network import Network
 import requests
 import openai
+from neo4j import GraphDatabase
 
 app = Flask(__name__)
 openai.api_key = os.getenv("API_GPT_YEU")
@@ -13,6 +14,26 @@ users = {
     "admin": "admin123",  # username: password
     "user": "user123"
 }
+
+NEO4J_URI = 'neo4j+s://1630ec5e.databases.neo4j.io'
+NEO4J_USERNAME = 'neo4j'
+NEO4J_PASSWORD = 'xcXJQxaIyPazmgU0tpFCypLrS0lg-_W0M6Qil33QJlM'
+NEO4J_DATABASE = 'neo4j'
+
+# Create a Neo4j graph object
+driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
+
+@app.route('/cypher', methods=['POST'])
+def execute_cypher_query():
+    query = request.form['query']
+    try:
+        with driver.session(database=NEO4J_DATABASE) as session:
+            result = session.run(query)
+            response = '\n'.join([str(record) for record in result])
+        print(response)
+        return response
+    except Exception as e:
+        return f"Error executing Cypher query: {str(e)}", 500
 
 # Home page that displays login options
 @app.route('/')
@@ -175,11 +196,13 @@ def visualize_knowledge_graph():
     return render_template_string(html_content)
 
 
-# Update the visualize route to render a new page with the graph
-@app.route('/view_graph')
-def view_graph():
-    # Load the knowledge graph data
-    file_path = 'knowledge_graph.pkl'  # Replace with the actual file path
+
+@app.route('/upload_file', methods=['POST'])
+def handle_file_upload():
+    file = request.files['file']
+    content = file.read().decode('utf-8')
+    print(content)
+    file_path = 'knowledge_graph_2.pkl'
     with open(file_path, 'rb') as file:
         data = pickle.load(file)
 
@@ -244,17 +267,9 @@ def view_graph():
     # Generate HTML content as a string
     html_content = net.generate_html()
 
-    # Pass the HTML to a template
-    return render_template('graph.html', graph_html=html_content)
+    # Return the generated HTML directly
+    return jsonify({'graph_html': html_content})
 
-
-
-@app.route('/upload_file', methods=['POST'])
-def upload_file():
-    file_content = request.form['file_content']
-    # Process the file content as needed
-    response = "Received file content: " + file_content  # Modify this as needed
-    return jsonify(response)
 
 
 if __name__ == '__main__':
