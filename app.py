@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, flash, request, jsonify, redirect, url_for, session, render_template_string
+from flask import make_response,Flask, render_template, flash, request, jsonify, redirect, url_for, session, render_template_string
 import pickle
 import networkx as nx
 from pyvis.network import Network
@@ -268,7 +268,11 @@ def handle_file_upload():
     html_content = net.generate_html()
 
     # Return the generated HTML directly
-    return jsonify({'graph_html': html_content})
+    response = make_response(jsonify({'graph_html': html_content}))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 
 
