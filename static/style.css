@@ -22,6 +22,7 @@ body,html{
 }
 .msg_card_body{
 	overflow-y: auto;
+	height: 600px;
 }
 .card-header{
 	border-radius: 15px 15px 0 0 !important;
@@ -188,6 +189,50 @@ border-radius: 0 0 15px 15px !important;
 	cursor: pointer;
 	font-size: 20px;
 }
+
+#messageFormeightQA {
+    height: 70vh; /* Set a fixed height */
+    overflow-y: auto; /* Enable scrolling inside this area only */
+    padding: 10px;
+}
+
+.file_btn {
+    background-color: rgba(0, 0, 0, 0.3); /* Same dark background as send button */
+    color: #007bff; /* Blue icon color */
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 18px;
+    border: none;
+    /*border-radius: 0 15px 15px 0 !important;*/
+}
+
+.file_btn:hover {
+    background-color: rgba(0, 0, 0, 0.5); /* Darker background on hover */
+}
+/* Sidebar styles */
+.sidebar {
+    background: linear-gradient(to right, rgb(38, 51, 61), rgb(50, 55, 65), rgb(33, 33, 78));
+    border-radius: 15px;
+    padding: 20px;
+}
+
+/* Sidebar Links */
+.sidebar a {
+    color: white; /* Change link color to white */
+    text-decoration: none; /* Remove underline from links */
+    padding: 10px;
+    display: block; /* Make links block-level elements for full width */
+    border-radius: 5px; /* Slight rounding of corners */
+    transition: background-color 0.3s; /* Smooth background transition */
+}
+
+.sidebar a:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Add a hover effect */
+}
+
+
 .action_menu{
 	z-index: 1;
 	position: absolute;
@@ -220,4 +265,5 @@ border-radius: 0 0 15px 15px !important;
 	.contacts_card{
 	margin-bottom: 15px !important;
 }
+
 }
