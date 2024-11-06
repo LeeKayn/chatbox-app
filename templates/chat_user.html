@@ -20,14 +20,14 @@
         }
 
         .card {
-            height: 90vh;
+            height: 90vh; /* Adjusted for better fullscreen experience */
             border-radius: 15px !important;
             background-color: rgba(0,0,0,0.4) !important;
         }
 
         .msg_card_body {
             overflow-y: auto;
-            height: calc(90vh - 160px);
+            height: calc(90vh - 160px); /* Adjusted for card header and input area */
             padding: 15px;
         }
 
@@ -112,6 +112,7 @@
             color: white;
         }
 
+        /* Sidebar styles */
         .sidebar {
             background: rgba(0,0,0,0.4);
             border-radius: 15px;
@@ -150,18 +151,11 @@
             background-color: rgba(0,0,0,0.5);
         }
 
+        /* Message form container */
         .message-input-container {
             padding: 15px;
             background-color: rgba(0,0,0,0.2);
             border-radius: 0 0 15px 15px;
-        }
-        .cypher-response {
-            font-family: monospace;
-            background-color: rgba(0,0,0,0.2);
-            padding: 10px;
-            border-radius: 10px;
-            margin: 5px 0;
-            white-space: pre-wrap;
         }
     </style>
 </head>
@@ -174,19 +168,14 @@
                     <h5>Menu</h5>
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#" id="uploadFileTab">Upload File</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="#" id="visualizationTab">Visualization</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#" id="qaTab">Q&A</a>
                         </li>
+                        <!-- Add Login Button -->
                         <li class="nav-item">
-                            <a class="nav-link" href="#" id="cypherTab">Cypher</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/" id="loginTab">Logout</a>
+                            <a class="nav-link" href="/" id="loginTab">Login</a>
                         </li>
                     </ul>
                 </div>
@@ -208,20 +197,8 @@
                         </div>
                     </div>
 
-                    <!-- Upload File Section -->
-                    <div id="uploadFileContent" class="card-body msg_card_body">
-                        <h5 class="text-white mb-4">Upload Your File</h5>
-                        <form id="fileUploadForm" class="text-center">
-                            <input type="file" id="fileInput" accept=".txt" style="display: none;" required/>
-                            <label for="fileInput" class="file_btn">
-                                <i class="fas fa-file-upload mr-2"></i>Upload your file
-                            </label>
-                        </form>
-                        <div id="fileContent" class="mt-4"></div>
-                    </div>
-
                     <!-- Visualization Section -->
-                    <div id="visualizationContent" class="card-body msg_card_body d-none">
+                    <div id="visualizationContent" class="card-body msg_card_body">
                         <h5 class="text-white">Visualization Content</h5>
                         <iframe src="/visualize" width="100%" height="100%" frameborder="0"></iframe>
                     </div>
@@ -240,31 +217,15 @@
                             </form>
                         </div>
                     </div>
-
-                    <div id="cypherContent" class="card-body msg_card_body d-none">
-                        <div id="cypherMessages" style="max-height: 70vh; overflow-y: auto; padding: 10px;"></div>
-                        <div class="message-input-container">
-                            <form id="cypherForm" class="input-group">
-                                <input type="text" id="cypherText" class="form-control type_msg" placeholder="Enter your Cypher query..." required/>
-                                <div class="input-group-append">
-                                    <button type="submit" class="input-group-text send_btn">
-                                        <i class="fas fa-terminal"></i>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-
                 </div>
             </div>
         </div>
     </div>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function () {
+            // Tab switching logic
             function switchTab(showId) {
                 $('.card-body').addClass('d-none');
                 $(showId).removeClass('d-none');
@@ -272,55 +233,48 @@
                 $(`[href="${showId}"]`).addClass('active');
             }
 
-            $("#uploadFileTab").click(function() {
-                switchTab('#uploadFileContent');
-            });
-
             $("#visualizationTab").click(function() {
                 switchTab('#visualizationContent');
             });
 
             $("#qaTab").click(function() {
                 switchTab('#qaContent');
+                $('#qaContent').removeClass('d-none');
                 $('#qaForm').show();
             });
 
-            $("#fileInput").change(function() {
-                const file = this.files[0];
-                if (file && file.type === "text/plain") {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        $("#fileContent").html(`<div class="msg_cotainer_send">${e.target.result}</div>`);
-                    };
-                    reader.readAsText(file);
-                } else {
-                    alert("Please upload a text file.");
-                }
-            });
-
+            // Q&A form handling
             $("#qaForm").submit(function(e) {
                 e.preventDefault();
                 const message = $("#qaText").val();
                 if (!message) return;
 
+                // Add user message
                 $("#messageFormeightQA").append(`
                     <div class="d-flex justify-content-end mb-4">
                         <div class="msg_cotainer_send">${message}</div>
                     </div>
                 `);
+
+                // Clear input
                 $("#qaText").val('');
+
+                // Auto-scroll to the bottom
                 $("#messageFormeightQA").scrollTop($("#messageFormeightQA")[0].scrollHeight);
 
+                // Send message to Flask server
                 $.ajax({
                     type: "POST",
                     url: "/get",
                     data: { msg: message },
                     success: function(response) {
+                        // Add bot response
                         $("#messageFormeightQA").append(`
                             <div class="d-flex justify-content-start mb-4">
                                 <div class="msg_cotainer">${response}</div>
                             </div>
                         `);
+                        // Auto-scroll to the bottom
                         $("#messageFormeightQA").scrollTop($("#messageFormeightQA")[0].scrollHeight);
                     },
                     error: function() {
@@ -329,48 +283,8 @@
                                 <div class="msg_cotainer">Error communicating with the server.</div>
                             </div>
                         `);
+                        // Auto-scroll to the bottom
                         $("#messageFormeightQA").scrollTop($("#messageFormeightQA")[0].scrollHeight);
-                    }
-                });
-            });
-            $("#cypherTab").click(function() {
-                switchTab('#cypherContent');
-                $('#cypherForm').show();
-            });
-
-            $("#cypherForm").submit(function(e) {
-                e.preventDefault();
-                const query = $("#cypherText").val();
-                if (!query) return;
-
-                $("#cypherMessages").append(`
-                    <div class="d-flex justify-content-end mb-4">
-                        <div class="msg_cotainer_send">${query}</div>
-                    </div>
-                `);
-                $("#cypherText").val('');
-                $("#cypherMessages").scrollTop($("#cypherMessages")[0].scrollHeight);
-
-                $.ajax({
-                    type: "POST",
-                    url: "/cypher",
-                    data: { query: query },
-                    success: function(response) {
-                        let responseHtml = `
-                            <div class="d-flex justify-content-start mb-4">
-                                <div class="msg_cotainer cypher-response">${response}</div>
-                            </div>
-                        `;
-                        $("#cypherMessages").append(responseHtml);
-                        $("#cypherMessages").scrollTop($("#cypherMessages")[0].scrollHeight);
-                    },
-                    error: function() {
-                        $("#cypherMessages").append(`
-                            <div class="d-flex justify-content-start mb-4">
-                                <div class="msg_cotainer">Error executing Cypher query. Please try again.</div>
-                            </div>
-                        `);
-                        $("#cypherMessages").scrollTop($("#cypherMessages")[0].scrollHeight);
                     }
                 });
             });
